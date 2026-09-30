@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài tập Ngữ pháp N2 - Bài 14 (Shinkanzen)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body {
+            background: linear-gradient(rgba(255, 245, 247, 0.55), rgba(240, 220, 225, 0.65)),
+                        url('https://images.unsplash.com/photo-1522383225653-ed111181a951?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .sakura-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .petal {
+            position: absolute;
+            background: #ffb7c5;
+            border-radius: 15px 0 15px 0;
+            opacity: 0.75;
+            filter: drop-shadow(0 2px 4px rgba(216, 90, 127, 0.2));
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translate(0, -10px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translate(120px, 105vh) rotate(360deg); opacity: 0; }
+        }
+
+        .app-card {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 24px;
+            padding: 32px 28px;
+            border: 1.5px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 20px 40px rgba(180, 100, 120, 0.15);
+        }
+
+        .lesson-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #d85a7f;
+            margin-bottom: 6px;
+        }
+
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 14px; 
+            font-weight: 700; 
+            color: #b06d7e; 
+            margin-bottom: 20px; 
+            padding-bottom: 10px;
+            border-bottom: 1.5px solid #f2d5db;
+        }
+
+        .question-card {
+            background: #fff5f7;
+            border-left: 4px solid #d85a7f;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .question-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #d85a7f;
+            margin-bottom: 8px;
+        }
+
+        .question-text { 
+            font-size: 18px; 
+            font-weight: 600; 
+            color: #3a2e30; 
+            line-height: 1.6;
+        }
+
+        .options-grid { display: flex; flex-direction: column; gap: 12px; }
+        
+        .opt-btn {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1.5px solid #f2d5db;
+            color: #4a383b;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .opt-btn::before {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #b06d7e;
+            border-radius: 50%;
+            margin-right: 14px;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .opt-btn:hover { 
+            background: #fff0f3; 
+            border-color: #d85a7f; 
+            transform: translateY(-1px); 
+        }
+
+        .opt-btn.correct { 
+            background: #e8f5e9 !important; 
+            border-color: #66bb6a !important; 
+            color: #2e7d32 !important; 
+        }
+        .opt-btn.correct::before {
+            background: #4caf50;
+            border-color: #4caf50;
+            box-shadow: inset 0 0 0 3px #ffffff;
+        }
+
+        .opt-btn.wrong { 
+            background: #ffebee !important; 
+            border-color: #ef5350 !important; 
+            color: #c62828 !important; 
+        }
+        .opt-btn.wrong::before {
+            background: #ef5350;
+            border-color: #ef5350;
+            box-shadow: inset 0 0 0 3px #ffffff;
+        }
+
+        .feedback { 
+            display: none;
+            margin-top: 20px; 
+            font-size: 15px; 
+            text-align: left;
+        }
+
+        .result-status {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .explain-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1.5px solid #f2d5db;
+            border-radius: 16px;
+            padding: 16px;
+            line-height: 1.6;
+            color: #3a2e30;
+        }
+
+        .explain-item {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .explain-item:last-child { margin-bottom: 0; }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 6px;
+            color: white;
+        }
+        .tag-grammar { background: #e07a9e; }
+        .tag-trans { background: #5c6bc0; }
+        .tag-meaning { background: #26a69a; }
+
+        .next-btn {
+            display: block;
+            width: 100%;
+            margin-top: 16px;
+            background: linear-gradient(135deg, #e07a9e 0%, #d85a7f 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .next-btn:hover { opacity: 0.95; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+    <div class="sakura-container" id="sakura-box"></div>
+
+    <div class="app-card">
+        <div class="lesson-title">Bài 14 - N2 (Shinkanzen Master)</div>
+
+        <div class="header">
+            <span id="q-count">Câu 1 / 23</span>
+            <span id="score-count">Điểm: 0</span>
+        </div>
+
+        <div class="question-card">
+            <div class="question-title" id="q-type">Câu 1: Chọn đáp án đúng</div>
+            <div class="question-text" id="question-content"></div>
+        </div>
+
+        <div class="options-grid" id="quiz-box">
+            <button class="opt-btn" onclick="checkAnswer(0)"></button>
+            <button class="opt-btn" onclick="checkAnswer(1)"></button>
+            <button class="opt-btn" onclick="checkAnswer(2)"></button>
+        </div>
+
+        <div class="feedback" id="feedback">
+            <div class="result-status" id="result-status"></div>
+            <div class="explain-card">
+                <div class="explain-item"><span class="tag tag-grammar">Cấu trúc</span><span id="ex-grammar"></span></div>
+                <div class="explain-item"><span class="tag tag-meaning">Ý nghĩa</span><span id="ex-meaning"></span></div>
+                <div class="explain-item"><span class="tag tag-trans">Dịch câu</span><span id="ex-trans"></span></div>
+            </div>
+            <button class="next-btn" onclick="nextQuestion()">Câu tiếp theo ➔</button>
+        </div>
+    </div>
+
+    <script>
+        function createPetal() {
+            const box = document.getElementById('sakura-box');
+            const p = document.createElement('div');
+            p.classList.add('petal');
+            p.style.width = Math.random() * 8 + 8 + 'px';
+            p.style.height = Math.random() * 10 + 10 + 'px';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDuration = Math.random() * 4 + 6 + 's';
+            box.appendChild(p);
+            setTimeout(() => p.remove(), 10000);
+        }
+        setInterval(createPetal, 400);
+
+        // Toàn bộ 23 câu bài tập Shinkanzen N2 - Bài 14 (Trang 66 - 67)
+        const quizData = [
+            // Mục 1: ～にもかかわらず
+            {
+                q: '彼は母親が ( ) にもかかわらず、毎日遊び歩いている。',
+                options: ['入院', '入院中だ', '入院中である'],
+                answer: 2,
+                grammar: 'N である + にもかかわらず',
+                meaning: 'Mặc dù... (Kết quả vế sau trái ngược với thực tế/kỳ vọng ở vế trước).',
+                trans: 'Mặc dù mẹ anh ấy đang nhập viện, nhưng hàng ngày anh ấy vẫn đi chơi rong bơi.'
+            },
+            {
+                q: '「うるさい」と注意されたにもかかわらず、みんな ( )。',
+                options: ['おしゃべりをやめない', '黙っている', 'しばらく静かにした'],
+                answer: 0,
+                grammar: '～にもかかわらず + Trạng thái trái ngược kỳ vọng',
+                meaning: 'Mặc dù đã bị nhắc nhở nhưng vế sau diễn tả hành động bất chấp vẫn tiếp diễn.',
+                trans: 'Mặc dù đã bị nhắc nhở là "ồn ào quá", mọi người vẫn không chịu dừng việc nói chuyện tán phét.'
+            },
+            {
+                q: 'このような大雨にもかかわらず、( )。',
+                options: ['皆さん、集まってください', 'みんなで集まりましょう', 'ようこそお集まりくださいました'],
+                answer: 2,
+                grammar: '～にもかかわらず + Sự việc thực tế (Không dùng câu cầu khiến/kêu gọi)',
+                meaning: 'Vế sau diễn tả sự việc/hành động thực tế đã xảy ra ngoài dự đoán.',
+                trans: 'Mặc dù trời mưa to như thế này, cảm ơn quý vị đã cất công tập hợp đông đủ đến đây.'
+            },
+            // Mục 2: ～ものの・～とはいうものの
+            {
+                q: '兄はいい会社に ( ) ものの、仕事にはあまり熱心ではない。',
+                options: ['就職する', '就職した', '就職'],
+                answer: 1,
+                grammar: 'V-た形 + ものの',
+                meaning: 'Tuy rằng / Mặc dù đã... nhưng (Vế sau không diễn ra như tưởng tượng từ vế trước).',
+                trans: 'Anh trai tôi tuy đã xin được vào một công ty tốt nhưng không mấy nhiệt tình với công việc.'
+            },
+            {
+                q: 'カンさんの気持ちは ( ) ものの、彼の言うとおりにはしたくない。',
+                options: ['理解できない', '理解できなかった', '理解できる'],
+                answer: 2,
+                grammar: 'V-辞書形 + ものの',
+                meaning: 'Tuy là có thể hiểu được cảm xúc của anh Kang đấy, nhưng...',
+                trans: 'Tuy rằng có thể hiểu được cảm xúc của anh Kang, nhưng tôi không muốn làm theo đúng những gì anh ấy nói.'
+            },
+            {
+                q: '今度の旅行、参加申し込みをしたものの、( )。',
+                options: ['行くかどうかまだ迷っている', '行かないことにしよう', 'キャンセルをお願いします'],
+                answer: 0,
+                grammar: '～ものの + Vế thể hiện thực tế chưa trọn vẹn',
+                meaning: 'Vế sau diễn tả thực tế vẫn còn vấn đề/chưa diễn ra như mong đợi.',
+                trans: 'Chuyến du lịch lần này, tuy là đã đăng ký tham gia rồi nhưng tôi vẫn đang phân vân không biết có đi hay không.'
+            },
+            // Mục 3: ～ながら（も）
+            {
+                q: '海の近くに生まれながら、わたしは ( )。',
+                options: ['魚が好きだ', '魚が好きではない', '魚とともに生きてきた'],
+                answer: 1,
+                grammar: 'N / V-ます + ながら(も)',
+                meaning: 'Tuy là... nhưng lại (Trái với suy đoán thông thường từ hoàn cảnh/vị trí).',
+                trans: 'Tuy sinh ra ở gần biển nhưng tôi lại không thích ăn cá.'
+            },
+            {
+                q: '彼女は小さい子供が3人もいながら、( )。',
+                options: ['夜遅くまで外で働いている', '子供を大切に育てている', 'いつも子供と一緒にいる'],
+                answer: 0,
+                grammar: 'V- stem/Trạng thái + ながら(も)',
+                meaning: 'Thực tế vế sau trái ngược với điều tưởng tượng từ hoàn cảnh.',
+                trans: 'Cô ấy tuy có tới 3 đứa con nhỏ nhưng vẫn làm việc bên ngoài đến tận đêm khuya.'
+            },
+            {
+                q: '大雨が ( )、まり子は自転車で出かけた。',
+                options: ['降りながら', '降るとわかっていながら', '降りそうながら'],
+                answer: 1,
+                grammar: 'V-て形 + いながら',
+                meaning: 'Dù biết rõ là... nhưng vẫn thực hiện hành động vế sau.',
+                trans: 'Dù biết rõ trời mưa to, Mariko vẫn đi ra ngoài bằng xe đạp.'
+            },
+            // Mục 4: ～つつ（も）
+            {
+                q: 'つまらない番組だと思いつつ、( )。',
+                options: ['最後まで見てしまった', '途中で見るのをやめた', 'いい番組はほかになかった'],
+                answer: 0,
+                grammar: 'V-ます + つつ(も)',
+                meaning: 'Dù trong tâm trí nghĩ là... nhưng hành động thực tế lại trái ngược.',
+                trans: 'Dù trong lòng nghĩ rằng chương trình này chán ngắt, tôi vẫn lỡ xem cho tới đoạn cuối.'
+            },
+            {
+                q: '彼はすべてを知りつつ、( )。',
+                options: ['だれも彼に本当のことを聞こうとしなかった', 'だれにも本当のことを話そうとしなかった', 'みんなは何も知らなかった'],
+                answer: 1,
+                grammar: 'V-ます + つつ(も)',
+                meaning: 'Chủ ngữ hai vế phải đồng nhất (anh ấy biết nhưng anh ấy không nói).',
+                trans: 'Dù biết tất cả mọi chuyện nhưng anh ấy đã không định nói sự thật cho bất kỳ ai.'
+            },
+            {
+                q: '悪いと知りつつカンニングを ( )。',
+                options: ['してしまった', 'するな', 'してみよう'],
+                answer: 0,
+                grammar: 'V-ます + つつ(も) + V-てしまった',
+                meaning: 'Nội tâm biết là xấu nhưng hành động vẫn lỡ vi phạm.',
+                trans: 'Dù biết là xấu nhưng tôi vẫn lỡ gian lận trong thi cử.'
+            },
+            // Mục 5: ～といっても
+            {
+                q: '夏休みといっても、( )。',
+                options: ['1か月も休める', '休めるのは2日しかない', 'やりたいことがいろいろある'],
+                answer: 1,
+                grammar: 'N + といっても',
+                meaning: 'Dù nói là... nhưng thực tế không mức độ như hình dung thông thường.',
+                trans: 'Dù nói là kỳ nghỉ hè nhưng thực tế tôi chỉ được nghỉ có đúng 2 ngày.'
+            },
+            {
+                q: '年をとっているといっても、父は ( )。',
+                options: ['もう90歳だ', '定年退職になった', 'まだとても元気だ'],
+                answer: 2,
+                grammar: 'V-普通形 + といっても',
+                meaning: 'Thực tế khác với hình ảnh suy đoán thông thường về tuổi tác.',
+                trans: 'Dù nói là đã nhiều tuổi nhưng bố tôi vẫn còn rất khỏe mạnh.'
+            },
+            {
+                q: '彼と仲がいいといっても、( )。',
+                options: ['結婚は考えていない', '結婚を考えている', 'よくいろいろなことを話す'],
+                answer: 0,
+                grammar: 'A-い + といっても + Phủ định suy đoán đi quá xa',
+                meaning: 'Thực tế không ở mức độ thân thiết đến mức tính chuyện kết hôn.',
+                trans: 'Dù nói là thân thiết với anh ấy, nhưng tôi không hề tính tới chuyện kết hôn.'
+            },
+            {
+                q: '( ) といっても、前に何回か会ったことがあるだけです。',
+                options: ['彼女とは親しくない', '彼女を知っている', '彼女を知らない'],
+                answer: 1,
+                grammar: 'V-普通形 + といっても',
+                meaning: 'Đưa ra mức độ thực tế nhẹ hơn để làm rõ lời nói.',
+                trans: 'Dù nói là biết cô ấy, nhưng chẳng qua chỉ là trước đây từng gặp vài lần thôi.'
+            },
+            // Mục 6: ～からといって
+            {
+                q: '子供だからといって、( ) だめだ。',
+                options: ['甘やかしては', 'もっと優しくしなければ', '大人と同じに扱っては'],
+                answer: 0,
+                grammar: 'N / Thể thông thường + からといって + ～てはいけない/だめだ',
+                meaning: 'Chỉ vì lý do... mà làm việc đó là không được.',
+                trans: 'Không thể chỉ vì là trẻ con mà chiều chuộng quá mức được.'
+            },
+            {
+                q: '成績がいいからといって、( )。',
+                options: ['就職は心配ない', '就職ができない', '就職ができるとは限らない'],
+                answer: 2,
+                grammar: '～からといって + ～とは限らない (Phủ định một phần)',
+                meaning: 'Chỉ vì lý do A thì không hẳn đương nhiên sẽ dẫn tới B.',
+                trans: 'Chỉ vì thành tích học tập tốt thì không hẳn là chắc chắn sẽ xin được việc.'
+            },
+            {
+                q: '何をしても自由だからといって、人に迷惑を ( )。',
+                options: ['かけないつもりだ', 'かけなかった', 'かけてはいけない'],
+                answer: 2,
+                grammar: '～からといって + ～てはいけない',
+                meaning: 'Chỉ vì được tự do làm mọi thứ không có nghĩa là được làm phiền người khác.',
+                trans: 'Chỉ vì tự do làm gì cũng được không có nghĩa là được phép gây phiền hà cho người khác.'
+            },
+            // Mục 1~6: Bài tập tổng hợp
+            {
+                q: '父は会社を経営しています。会社 ( ) 社員は6人だけです。',
+                options: ['にもかかわらず', 'といっても', 'だからといって'],
+                answer: 1,
+                grammar: 'N + といっても',
+                meaning: 'Dù nói là công ty nhưng thực tế quy mô chỉ có 6 người.',
+                trans: 'Bố tôi đang kinh doanh một công ty. Nói là công ty thế thôi chứ nhân viên chỉ có đúng 6 người.'
+            },
+            {
+                q: 'あの人は事実を ( )、わたしには何も言わなかった。',
+                options: ['知っていながら', '知っているといっても', '知っているからといって'],
+                answer: 0,
+                grammar: 'V-て形 + いながら',
+                meaning: 'Dù biết rõ sự thật nhưng hành động thực tế lại không nói gì.',
+                trans: 'Người đó dù biết rõ sự thật nhưng đã không nói bất cứ điều gì với tôi.'
+            },
+            {
+                q: 'いつかスイスに行ってみたいと ( )、なかなか行くチャンスがない。',
+                options: ['思うといっても', '思いつつ', '思うからといって'],
+                answer: 1,
+                grammar: 'V-ます + つつ',
+                meaning: 'Dù trong lòng luôn nghĩ/mong muốn nhưng thực tế chưa thực hiện được.',
+                trans: 'Dù trong lòng luôn nghĩ rằng một ngày nào đó muốn thử đến Thụy Sĩ, nhưng mãi mà tôi chưa có cơ hội để đi.'
+            },
+            {
+                q: '工事費が高い ( )、この施設はもう3回も建て直しをしている。',
+                options: ['にもかかわらず', 'といっても', 'ながら'],
+                answer: 0,
+                grammar: 'N / 普通形 + にもかかわらず',
+                meaning: 'Mặc dù chi phí thi công đắt đỏ nhưng thực tế vẫn xây lại tới 3 lần.',
+                trans: 'Mặc dù chi phí thi công đắt đỏ, cơ sở này vậy mà đã được xây dựng lại tới 3 lần rồi.'
+            },
+            {
+                q: '春が ( )、まだ寒い日が続く。',
+                options: ['来たからといって', '来ながら', '来たとはいうものの'],
+                answer: 2,
+                grammar: 'V-た形 + とはいうものの',
+                meaning: 'Sự thật là mùa xuân đã đến rồi nhưng thực tế thời tiết vẫn còn lạnh.',
+                trans: 'Tuy nói là mùa xuân đã sang nhưng những ngày giá lạnh vẫn tiếp tục kéo dài.'
+            }
+        ];
+
+        let current = 0, score = 0, canClick = true;
+
+        function init() {
+            const item = quizData[current];
+            document.getElementById('q-count').innerText = `Câu ${current + 1} / ${quizData.length}`;
+            document.getElementById('score-count').innerText = `Điểm: ${score}`;
+            document.getElementById('q-type').innerText = `Câu ${current + 1}: Chọn đáp án đúng`;
+            document.getElementById('question-content').innerText = item.q;
+            document.getElementById('feedback').style.display = 'none';
+            canClick = true;
+
+            const btns = document.querySelectorAll('.opt-btn');
+            btns.forEach((btn, i) => {
+                btn.innerText = item.options[i];
+                btn.className = 'opt-btn';
+            });
+        }
+
+        function checkAnswer(selectedIndex) {
+            if(!canClick) return; 
+            canClick = false;
+
+            const item = quizData[current];
+            const btns = document.querySelectorAll('.opt-btn');
+            const statusEl = document.getElementById('result-status');
+
+            if(selectedIndex === item.answer) {
+                btns[selectedIndex].classList.add('correct'); 
+                score += 10;
+                statusEl.innerHTML = `<span style="color: #4caf50;">✓ 正解 (Chính xác!)</span>`;
+            } else {
+                btns[selectedIndex].classList.add('wrong');
+                btns[item.answer].classList.add('correct');
+                statusEl.innerHTML = `<span style="color: #ef5350;">✕ ざんねん (Đáp án đúng là: ${item.options[item.answer]})</span>`;
+            }
+
+            document.getElementById('ex-grammar').innerText = item.grammar;
+            document.getElementById('ex-meaning').innerText = item.meaning;
+            document.getElementById('ex-trans').innerText = item.trans;
+
+            document.getElementById('feedback').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            current = (current + 1) % quizData.length;
+            init();
+        }
+
+        init();
+    </script>
+</body>
+</html>
